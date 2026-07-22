@@ -1,0 +1,71 @@
+.layout {
+    display: flex;
+    height: 100vh;
+}
+
+.sidebar {
+    padding: 30px;
+    border-right: 1px solid var(--seporator-color);
+    display: flex;
+    flex-direction: column;
+}
+
+.exit {
+    display: flex;
+    gap: 9px;
+    margin-top: auto;
+    align-items: center;
+    justify-content: center;
+}
+
+.menu {
+    display: flex;
+    gap: 35px;
+    flex-direction: column;
+}
+
+.link {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    text-decoration: none;
+    color: var(--text-color);
+}
+
+.link:hover {
+    color: var(--primary-hover-color);
+}
+
+.active {
+    color: var(--primary-hover-color);
+}
+
+.user {
+    margin-bottom: 46px;
+}
+
+.name {
+    font-size: 20px;
+    font-weight: 700;
+    line-height: normal;
+    color: var(--text-color);
+}
+
+.email {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: normal;
+    color: #9ea1b1;
+    text-decoration: none;
+}
+
+.avatar {
+    margin-bottom: 20px;
+    filter: drop-shadow(0px 8px 40px rgba(255, 197, 41, 0.25));
+}
+
+.content {
+    padding: 40px 60px;
+    width: 100%;
+}
