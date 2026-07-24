@@ -1,8 +1,9 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+
 import "./index.css";
-//import App from "./App.tsx";
+
 import { Menu } from "./pages/Menu/Menu";
 import { Cart } from "./pages/Cart/Cart";
 import { ErrorNotFound } from "./pages/Error/ErrorNotFound";
@@ -11,6 +12,8 @@ import { Product } from "./pages/Product/Product";
 import { Login } from "./pages/Login/Login";
 import { Favorite } from "./pages/Favorite/Favorite";
 import { Movie } from "./pages/Movie/Movie";
+import axios from "axios";
+import { PREFIX } from "./helpers/API";
 
 const router = createBrowserRouter([
   {
@@ -36,10 +39,28 @@ const router = createBrowserRouter([
       {
         path: "/product/:id",
         element: <Product />,
+        errorElement: <>Ошибка</>,
+        loader: async ({ params }) => {
+          return {
+            // Вытаскиваем res.data, чтобы в компонент пришли чистые данные товара
+            data: axios
+              .get(`${PREFIX}/products/${params.id}`)
+              .then((res) => res.data),
+          };
+        },
       },
       {
         path: "/movie/:id",
         element: <Movie />,
+        errorElement: <>Ошибка: ничего не найдено</>,
+        loader: async ({ params }) => {
+          return {
+            // Вытаскиваем res.data, чтобы в компонент пришли чистые данные товара
+            data: axios
+              .get(`${PREFIX}/products/${params.id}`)
+              .then((res) => res.data),
+          };
+        },
       },
     ],
   },
