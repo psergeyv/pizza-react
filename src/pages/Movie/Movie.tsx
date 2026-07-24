@@ -8,7 +8,12 @@ export function Movie() {
   return (
     <>
       <Suspense fallback={<p>Загружаю...</p>}>
-        <Await resolve={data.data}>{(data) => <>{data.name}</>}</Await>
+        <Await
+          resolve={data.data}
+          errorElement={<div>Фильм не найден (Ошибка 404)</div>}
+        >
+          {(data) => <>{data.name}</>}
+        </Await>
       </Suspense>
     </>
   );

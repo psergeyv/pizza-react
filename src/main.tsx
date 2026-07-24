@@ -52,7 +52,7 @@ const router = createBrowserRouter([
       {
         path: "/movie/:id",
         element: <Movie />,
-        errorElement: <>Ошибка: ничего не найдено</>,
+        errorElement: <>Ничего не найдено</>,
         loader: async ({ params }) => {
           return {
             // Вытаскиваем res.data, чтобы в компонент пришли чистые данные товара
