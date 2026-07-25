@@ -5,8 +5,10 @@ function App() {
   return (
     <>
       <Button onClick={() => console.log("Нажал")}>Кнопка</Button>
-      <Button appearence="btn-big" onClick={() => console.log("Нажал")}>Кнопка</Button>
-      <Input placeholder="Email"/>      
+      <Button appearence="btn-big" onClick={() => console.log("Нажал")}>
+        Кнопка
+      </Button>
+      <Input placeholder="Email" />
     </>
   );
 }
