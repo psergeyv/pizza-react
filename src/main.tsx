@@ -14,11 +14,18 @@ import { Favorite } from "./pages/Favorite/Favorite";
 import { Movie } from "./pages/Movie/Movie";
 import axios from "axios";
 import { PREFIX } from "./helpers/API";
+import { AuthLayout } from "./layout/Auth/AuthLayout";
+import { Register } from "./pages/Register/Register";
+import { RequireAuth } from "./helpers/RequireAuth";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Layout />,
+    element: (
+      <RequireAuth>
+        <Layout />
+      </RequireAuth>
+    ),
     children: [
       {
         path: "/",
@@ -27,10 +34,6 @@ const router = createBrowserRouter([
       {
         path: "/cart",
         element: <Cart />,
-      },
-      {
-        path: "/login",
-        element: <Login />,
       },
       {
         path: "/favorites",
@@ -61,6 +64,20 @@ const router = createBrowserRouter([
               .then((res) => res.data),
           };
         },
+      },
+    ],
+  },
+  {
+    path: "auth",
+    element: <AuthLayout />,
+    children: [
+      {
+        path: "login",
+        element: <Login />,
+      },
+      {
+        path: "register",
+        element: <Register />,
       },
     ],
   },
