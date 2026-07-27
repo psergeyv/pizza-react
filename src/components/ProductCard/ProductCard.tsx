@@ -3,8 +3,10 @@ import styles from "./ProductCard.module.css";
 import { type MouseEventHandler } from "react";
 import type { ProductCardProps } from "./ProductCard.props";
 import { useDispatch } from "react-redux";
+
 import type { AppDispath } from "../../store/store";
 import { cartActions } from "../../store/cart.slice";
+import { favoriteActions } from "../../store/favorite.slice";
 
 function ProductCard(props: ProductCardProps) {
   const dispatch = useDispatch<AppDispath>();
@@ -12,6 +14,20 @@ function ProductCard(props: ProductCardProps) {
   const add: MouseEventHandler<HTMLButtonElement> = (e) => {
     e.preventDefault();
     dispatch(cartActions.add(props.id));
+  };
+
+  const addFavorite: MouseEventHandler<HTMLButtonElement> = (e) => {
+    e.preventDefault();
+    dispatch(
+      favoriteActions.add({
+        id: props.id,
+        name: props.name,
+        price: props.price,
+        image: props.image,
+        rating: props.rating,
+        ingredients: props.description ? props.description.split(", ") : [],
+      }),
+    );
   };
 
   return (
@@ -39,6 +55,11 @@ function ProductCard(props: ProductCardProps) {
         <div className={styles["footer"]}>
           <div className={styles["title"]}>{props.name}</div>
           <div className={styles["description"]}>{props.description}</div>
+        </div>
+        <div className={styles["favorite"]}>
+          <button className={styles["add-to-favorite"]} onClick={addFavorite}>
+            В избранное
+          </button>
         </div>
       </div>
     </Link>

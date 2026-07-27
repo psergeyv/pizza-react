@@ -12,6 +12,7 @@ export function Layout() {
   const dispatch = useDispatch<AppDispath>();
   const profile = useSelector((s: RootState) => s.user.profile);
   const items = useSelector((s: RootState) => s.cart.items);
+  const itemsFavorite = useSelector((s: RootState) => s.favorite.items);
 
   useEffect(() => {
     dispatch(getProfile());
@@ -55,6 +56,16 @@ export function Layout() {
           >
             <img src="/icons/cart.svg" alt="" />
             Корзина {items.reduce((acc, item) => (acc += item.count), 0)}
+          </NavLink>
+          <NavLink
+            to="/favorites"
+            className={({ isActive }) =>
+              cn(styles["link"], {
+                [styles.active]: isActive,
+              })
+            }
+          >
+            Избранное {itemsFavorite.reduce((acc) => (acc += 1), 0)}
           </NavLink>
         </div>
         <Button className={styles["exit"]} onClick={logout}>
