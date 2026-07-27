@@ -2,15 +2,17 @@ import { Link } from "react-router-dom";
 import styles from "./ProductCard.module.css";
 import { type MouseEventHandler } from "react";
 import type { ProductCardProps } from "./ProductCard.props";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
-import type { AppDispath } from "../../store/store";
+import type { AppDispath, RootState } from "../../store/store";
 import { cartActions } from "../../store/cart.slice";
 import { favoriteActions } from "../../store/favorite.slice";
 
 function ProductCard(props: ProductCardProps) {
   const dispatch = useDispatch<AppDispath>();
-
+  const userID = useSelector(
+    (s: RootState) => s.user?.profile?.id || s.user?.profile?.id || 0,
+  );
   const add: MouseEventHandler<HTMLButtonElement> = (e) => {
     e.preventDefault();
     dispatch(cartActions.add(props.id));
@@ -20,12 +22,15 @@ function ProductCard(props: ProductCardProps) {
     e.preventDefault();
     dispatch(
       favoriteActions.add({
-        id: props.id,
-        name: props.name,
-        price: props.price,
-        image: props.image,
-        rating: props.rating,
-        ingredients: props.description ? props.description.split(", ") : [],
+        user: userID,
+        item: {
+          id: props.id,
+          name: props.name,
+          price: props.price,
+          image: props.image,
+          rating: props.rating,
+          ingredients: props.description ? props.description.split(", ") : [],
+        },
       }),
     );
   };

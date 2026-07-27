@@ -4,12 +4,16 @@ import { loadState } from "./storage";
 export const FAVORITE_PERSISTENT_STATE = "favoriteData";
 
 export interface FavoriteItem {
-  id: number;
-  name: string;
-  price: number;
-  ingredients: string[];
-  image: string;
-  rating: number;
+  user: number; // ID пользователя
+  item: {
+    // Данные самого продукта
+    id: number;
+    name: string;
+    price: number;
+    ingredients: string[];
+    image: string;
+    rating: number;
+  };
 }
 
 export interface FavoriteState {
@@ -31,29 +35,58 @@ export const favoriteSlice = createSlice({
       state.items = [];
     },
 
-    // Удалить конкретный ID из избранного (Заменил дубли delete/remove на один метод)
+    // Удалить конкретный товар по его ID
     remove: (state, action: PayloadAction<number>) => {
-      state.items = state.items.filter((i) => i.id !== action.payload);
+      // 🔥 ИСПРАВЛЕНИЕ: Сравниваем с i.item.id, так как id теперь внутри объекта item
+      state.items = state.items.filter((i) => i.item.id !== action.payload);
+
+      // Перезаписываем глобальный localStorage (если используется общая синхронизация)
+      localStorage.setItem(FAVORITE_PERSISTENT_STATE, JSON.stringify(state));
     },
 
-    // Добавить ID в избранное (Исправленная логика)
+    // Добавить товар в избранное
     add: (state, action: PayloadAction<FavoriteItem>) => {
-      const existed = state.items.find((i) => i.id === action.payload.id);
+      const { user, item } = action.payload;
 
-      // Если товара нет в избранном — добавляем весь прилетевший объект
+      // 🔥 ИСПРАВЛЕНИЕ: Ищем товар по его id внутри item и проверяем, что он принадлежит текущему пользователю
+      const existed = state.items.find(
+        (i) => i.item.id === item.id && i.user === user,
+      );
+
+      // Если такого товара у этого пользователя еще нет в избранном — добавляем
       if (!existed) {
         state.items.push(action.payload);
+
+        // КРИТИЧЕСКОЕ ТРЕБОВАНИЕ: Дополнительно дублируем сохранение в персональный ключ пользователя!
+        localStorage.setItem(
+          `favoriteData_${user}`,
+          JSON.stringify(state.items.filter((i) => i.user === user)),
+        );
+        localStorage.setItem(FAVORITE_PERSISTENT_STATE, JSON.stringify(state));
       }
     },
 
-    // Опционально: Переключатель (Toggle) — если есть, удаляет, если нет — добавляет
+    // Переключатель (Toggle)
     toggle: (state, action: PayloadAction<FavoriteItem>) => {
-      const index = state.items.findIndex((i) => i.id === action.payload.id);
+      const { user, item } = action.payload;
+
+      // 🔥 ИСПРАВЛЕНИЕ: Ищем индекс с учетом вложенности item.id
+      const index = state.items.findIndex(
+        (i) => i.item.id === item.id && i.user === user,
+      );
+
       if (index !== -1) {
-        state.items.splice(index, 1); // Удаляем, если нашли по ID
+        state.items.splice(index, 1); // Удаляем, если нашли
       } else {
-        state.items.push(action.payload); // Добавляем весь объект, если не нашли
+        state.items.push(action.payload); // Добавляем, если не нашли
       }
+
+      // Синхронизируем персональный localStorage пользователя
+      localStorage.setItem(
+        `favoriteData_${user}`,
+        JSON.stringify(state.items.filter((i) => i.user === user)),
+      );
+      localStorage.setItem(FAVORITE_PERSISTENT_STATE, JSON.stringify(state));
     },
   },
 });

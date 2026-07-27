@@ -34,15 +34,17 @@ export function Favorite() {
         {/* Итерируемся по уже отфильтрованным ПОЛНЫМ данным продуктов */}
         {favoriteProducts.map((p) => (
           <ProductCard
-            key={p.id}
-            id={p.id}
-            name={p.name}
+            key={p.item.id}
+            id={p.item.id}
+            name={p.item.name}
             description={
-              p.ingredients ? p.ingredients.join(", ") : p.ingredients
+              p.item.ingredients
+                ? p.item.ingredients.join(", ")
+                : p.item.ingredients
             }
-            image={p.image}
-            price={p.price}
-            rating={p.rating}
+            image={p.item.image}
+            price={p.item.price}
+            rating={p.item.rating}
           />
         ))}
       </div>
