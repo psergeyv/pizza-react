@@ -3,7 +3,7 @@ import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 
 import "./index.css";
-//import App from "./App.tsx";
+
 import { Menu } from "./pages/Menu/Menu";
 import { Cart } from "./pages/Cart/Cart";
 import { ErrorNotFound } from "./pages/Error/ErrorNotFound";
@@ -14,11 +14,20 @@ import { Favorite } from "./pages/Favorite/Favorite";
 import { Movie } from "./pages/Movie/Movie";
 import axios from "axios";
 import { PREFIX } from "./helpers/API";
+import { AuthLayout } from "./layout/Auth/AuthLayout";
+import { Register } from "./pages/Register/Register";
+import { RequireAuth } from "./helpers/RequireAuth";
+import { Provider } from "react-redux";
+import { store } from "./store/store";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Layout />,
+    element: (
+      <RequireAuth>
+        <Layout />
+      </RequireAuth>
+    ),
     children: [
       {
         path: "/",
@@ -27,10 +36,6 @@ const router = createBrowserRouter([
       {
         path: "/cart",
         element: <Cart />,
-      },
-      {
-        path: "/login",
-        element: <Login />,
       },
       {
         path: "/favorites",
@@ -52,7 +57,7 @@ const router = createBrowserRouter([
       {
         path: "/movie/:id",
         element: <Movie />,
-        errorElement: <>Ошибка: ничего не найдено</>,
+        errorElement: <>Ничего не найдено</>,
         loader: async ({ params }) => {
           return {
             // Вытаскиваем res.data, чтобы в компонент пришли чистые данные товара
@@ -65,12 +70,28 @@ const router = createBrowserRouter([
     ],
   },
   {
+    path: "auth",
+    element: <AuthLayout />,
+    children: [
+      {
+        path: "login",
+        element: <Login />,
+      },
+      {
+        path: "register",
+        element: <Register />,
+      },
+    ],
+  },
+  {
     path: "*",
     element: <ErrorNotFound />,
   },
 ]);
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <Provider store={store}>
+      <RouterProvider router={router} />
+    </Provider>
   </StrictMode>,
 );
