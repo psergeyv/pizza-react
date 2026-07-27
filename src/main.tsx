@@ -17,6 +17,8 @@ import { PREFIX } from "./helpers/API";
 import { AuthLayout } from "./layout/Auth/AuthLayout";
 import { Register } from "./pages/Register/Register";
 import { RequireAuth } from "./helpers/RequireAuth";
+import { Provider } from "react-redux";
+import { store } from "./store/store";
 
 const router = createBrowserRouter([
   {
@@ -88,6 +90,8 @@ const router = createBrowserRouter([
 ]);
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <Provider store={store}>
+      <RouterProvider router={router} />
+    </Provider>
   </StrictMode>,
 );
