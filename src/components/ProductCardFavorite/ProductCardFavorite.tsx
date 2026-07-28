@@ -1,15 +1,16 @@
+import type { MouseEventHandler } from "react";
 import { Link } from "react-router-dom";
-import styles from "./ProductCard.module.css";
-import { type MouseEventHandler } from "react";
-import type { ProductCardProps } from "./ProductCard.props";
 import { useDispatch, useSelector } from "react-redux";
-
 import type { AppDispath, RootState } from "../../store/store";
-import { cartActions } from "../../store/cart.slice";
 import { favoriteActions } from "../../store/favorite.slice";
+import type { ProductCardProps } from "../ProductCard/ProductCard.props";
+import styles from "../ProductCard/ProductCard.module.css";
+import { cartActions } from "../../store/cart.slice";
 
-function ProductCard(props: ProductCardProps) {
+function ProductCardFavorite(props: ProductCardProps) {
   const dispatch = useDispatch<AppDispath>();
+
+  // 1. Получаем ID текущего пользователя
   const currentUserId = useSelector(
     (s: RootState) => s.user?.profile?.id || s.user?.profile?.id || 0,
   );
@@ -17,9 +18,11 @@ function ProductCard(props: ProductCardProps) {
     e.preventDefault();
     dispatch(cartActions.add(props.id));
   };
+  // 2. Проверяем, находится ли ИМЕННО ЭТОТ товар в избранном у ИМЕННО ЭТОГО пользователя
   const isFavorite = useSelector((s: RootState) =>
     s.favorite.items.some((i) => i.id === props.id && i.user === currentUserId),
   );
+
   const handleFavoriteClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault(); // Останавливаем переход по ссылке <Link>
 
@@ -60,7 +63,12 @@ function ProductCard(props: ProductCardProps) {
         </div>
         <div className={styles["favorite"]}>
           {isFavorite ? (
-            "♥ В избранном"
+            <button
+              className={styles["add-to-favorite"]}
+              onClick={handleFavoriteClick}
+            >
+              ♥ В избранном
+            </button>
           ) : (
             <button
               className={styles["add-to-favorite"]}
@@ -75,4 +83,4 @@ function ProductCard(props: ProductCardProps) {
   );
 }
 
-export default ProductCard;
+export default ProductCardFavorite;

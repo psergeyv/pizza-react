@@ -1,52 +1,74 @@
-import ProductCard from "../../components/ProductCard/ProductCard";
+import type { Product } from "../../interfaces/product.interface";
 import styles from "./Favorite.module.css";
-import { useDispatch, useSelector } from "react-redux";
-import type { AppDispath, RootState } from "../../store/store";
+import { useSelector } from "react-redux";
+import type { RootState } from "../../store/store";
+import { PREFIX } from "../../helpers/API";
+import { useEffect, useState } from "react";
+import axios from "axios";
+
+import ProductCart from "../../components/ProductCardFavorite/ProductCardFavorite";
 
 export function Favorite() {
-  const dispatch = useDispatch<AppDispath>();
+  const [favoriteProducts, setFavoriteProducts] = useState<Product[]>([]);
 
-  // 1. Достаем массив ID из Redux-слайса избранного (исходя из вашего favoriteSlice)
-  const favoriteIds = useSelector((s: RootState) => s.favorite.items); // [{ id: 1 }, { id: 2 }]
-
-  // 2. Достаем ПОЛНЫЙ список всех продуктов из слайса меню (подставьте имя вашего слайса, например s.menu.items)
-  const allProducts = useSelector((s: RootState) => s.favorite.items);
-
-  // 3. Фильтруем продукты: оставляем только те, чей ID сохранен в избранном
-  const favoriteProducts = allProducts.filter((product) =>
-    favoriteIds.some((fav) => fav.id === product.id),
+  const currentUserId = useSelector(
+    (s: RootState) => s.user?.profile?.id || s.user?.profile?.id || 0,
   );
 
+  // Получаем список ID избранных товаров для текущего пользователя
+  const favoriteIds = useSelector((s: RootState) =>
+    s.favorite.items
+      .filter((item) => item.user === currentUserId)
+      .map((item) => item.id),
+  );
+  // получаем все свойства товара
+  const getItem = async (id: number) => {
+    const { data } = await axios.get<Product>(`${PREFIX}/products/${id}`);
+    return data;
+  };
+  // Получаем ВСЕ продукты из меню для сопоставления
+  const loadAllItems = async () => {
+    const res = await Promise.all(favoriteIds.map((i) => getItem(i)));
+    setFavoriteProducts(res);
+  };
+  // Оставляем только те продукты, которые есть в списке favoriteIds
+  useEffect(() => {
+    loadAllItems();
+  }, [favoriteIds]);
+
+  if (favoriteIds.length === 0) {
+    return (
+      <div className={styles.empty}>У вас пока нет избранных товаров.</div>
+    );
+  }
+
   // 4. Добавляем состояние "ничего не найдено" (Критичная проблема, которую мы исправляли)
-  if (favoriteProducts.length === 0) {
+  if (favoriteIds.length === 0) {
     return (
       <div className={styles.empty}>
-        <h2>Ничего не найдено</h2>
-        <p>Вы еще не добавили ни одного товара в избранное.</p>
+        <h2>Избранное</h2>
+        <p>У вас пока нет избранных товаров.</p>
       </div>
     );
   }
 
   return (
     <>
-      <h1 className={styles.title}>Favorites</h1>
+      <h1 className={styles.title}>Избранное</h1>
       <div className={styles.wrapper}>
-        {/* Итерируемся по уже отфильтрованным ПОЛНЫМ данным продуктов */}
-        {favoriteProducts.map((p) => (
-          <ProductCard
-            key={p.item.id}
-            id={p.item.id}
-            name={p.item.name}
-            description={
-              p.item.ingredients
-                ? p.item.ingredients.join(", ")
-                : p.item.ingredients
-            }
-            image={p.item.image}
-            price={p.item.price}
-            rating={p.item.rating}
-          />
-        ))}
+        {favoriteProducts.map((i) => {
+          const product = favoriteProducts.find((p) => p.id === i.id);
+          if (!product) {
+            return;
+          }
+          return (
+            <ProductCart
+              key={product.id}
+              description={product.ingredients.join(", ")}
+              {...product}
+            />
+          );
+        })}
       </div>
     </>
   );
